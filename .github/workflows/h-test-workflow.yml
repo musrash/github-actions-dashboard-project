@@ -1,0 +1,16 @@
+name: Second Test Workflow
+
+on:
+  workflow_run:
+    workflows: ["Test Workflow"]
+    types:
+      - completed
+
+jobs:
+  second-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Run a second test command
+        run: echo "Running second workflow after Test Workflow completed!"
