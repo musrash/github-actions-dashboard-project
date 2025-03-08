@@ -1,4 +1,4 @@
-name: Failing Test Workflow
+name: failing-test-workflow
 
 on:
   push:

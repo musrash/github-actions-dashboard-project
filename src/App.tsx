@@ -60,8 +60,8 @@ function App() {
       <div>
         <label>Sortieren nach: </label>
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "name" | "date")}>
-          <option value="date">Datum des letzten Laufs (Neueste zuerst)</option>
-          <option value="name">Name (A–Z)</option>
+          <option value="date">Datum</option>
+          <option value="name">Name</option>
         </select>
       </div>
 

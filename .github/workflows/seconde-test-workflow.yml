@@ -1,4 +1,4 @@
-name: seconde Test Workflow
+name: seconde-test-workflow
 
 on:
   push:
