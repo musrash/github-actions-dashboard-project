@@ -1,4 +1,4 @@
-name: Fourth-Test-Workflow
+name: fourth-test-workflow
 
 on:
   workflow_run:
