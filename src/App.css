@@ -1,42 +1,91 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.app-container {
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #f4f4f4;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sort-buttons {
+  margin-bottom: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.sort-btn {
+  padding: 10px 20px;
+  margin: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
 }
 
-.card {
-  padding: 2em;
+.sort-btn:hover {
+  background-color: #0056b3;
 }
 
-.read-the-docs {
-  color: #888;
+.loading-text {
+  font-size: 1.2rem;
+  color: #333;
 }
+
+.workflow-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.workflow-card {
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.workflow-card.success {
+  background-color: #d4edda;
+  border-left: 5px solid #28a745;
+}
+
+.workflow-card.failed {
+  background-color: #f8d7da;
+  border-left: 5px solid #dc3545;
+}
+
+.workflow-card.pending {
+  background-color: #fff3cd;
+  border-left: 5px solid #ffc107;
+}
+
+.workflow-card:hover {
+  transform: scale(1.03);
+}
+
+.workflow-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.workflow-info {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.workflow-link {
+  display: block;
+  margin-top: 10px;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.workflow-link:hover {
+  text-decoration: underline;
+}
+
