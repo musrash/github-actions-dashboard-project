@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchWorkflows, fetchWorkflowRuns } from "./api/github";
+import "./App.css"; 
 
 function App() {
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortedWorkflows, setSortedWorkflows] = useState<any[]>([]); // Neuer State für sortierte Workflows
+  const [sortedWorkflows, setSortedWorkflows] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState<"name" | "date">("date");
 
   useEffect(() => {
@@ -36,7 +37,7 @@ function App() {
     loadWorkflows();
   }, []);
 
-  // 🔹 useEffect für Sortierung - wird ausgeführt, wenn sich "sortBy" ändert
+  //  Sortierung basierend auf "sortBy"
   useEffect(() => {
     const sorted = [...workflows].sort((a, b) => {
       if (sortBy === "name") {
@@ -44,20 +45,19 @@ function App() {
       } else if (sortBy === "date") {
         const dateA = a.lastRun ? new Date(a.lastRun.created_at).getTime() : 0;
         const dateB = b.lastRun ? new Date(b.lastRun.created_at).getTime() : 0;
-        return dateB - dateA; // Immer Neueste zuerst
+        return dateB - dateA; 
       }
       return 0;
     });
 
-    setSortedWorkflows(sorted); // Aktualisiere die sortierte Liste
-  }, [workflows, sortBy]); // ⬅️ useEffect wird getriggert, wenn sich sortBy ändert
+    setSortedWorkflows(sorted);
+  }, [workflows, sortBy]);
 
   return (
-    <div>
-      <h1>GitHub Actions Workflows</h1>
+    <div className="app-container">
+      <h1 className="title">GitHub Actions Workflows</h1>
 
-      {/* 🔹 Sortier-Steuerung */}
-      <div>
+      <div className="sort-container">
         <label>Sortieren nach: </label>
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "name" | "date")}>
           <option value="date">Datum</option>
@@ -65,31 +65,34 @@ function App() {
         </select>
       </div>
 
-      {loading && <p>Lade Workflows...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <p className="loading-text">Lade Workflows...</p>}
+      {error && <p className="error-text">{error}</p>}
 
-      <div style={{ display: "grid", gap: "10px" }}>
+      <div className="workflow-container">
         {sortedWorkflows.map((workflow) => (
           <div
             key={workflow.id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "10px",
-              borderRadius: "8px",
-              backgroundColor: workflow.lastRun?.conclusion === "success" ? "#d4edda" : "#f8d7da",
-            }}
+            className={`workflow-card ${
+              loading
+                ? "pending" 
+                : workflow.lastRun?.conclusion === "success"
+                ? "success"
+                : workflow.lastRun?.conclusion === "failure"
+                ? "failed"
+                : "pending"
+            }`}
           >
-            <h2>{workflow.name}</h2>
-            <p><strong>Status:</strong> {workflow.lastRun ? workflow.lastRun.conclusion : "Noch nicht ausgeführt"}</p>
-            <p><strong>Event:</strong> {workflow.lastRun ? workflow.lastRun.event : "Unbekannt"}</p>
-            <p><strong>Branch:</strong> {workflow.lastRun ? workflow.lastRun.head_branch : "Unbekannt"}</p>
-            <p><strong>Gestartet von:</strong> {workflow.lastRun?.actor?.login || "Unbekannt"}</p>
-            <p><strong>Datum:</strong> {workflow.lastRun ? new Date(workflow.lastRun.created_at).toLocaleString() : "Unbekannt"}</p>
-            <a href={workflow.lastRun?.html_url} target="_blank" rel="noopener noreferrer">
+            <h2 className="workflow-name">{workflow.name}</h2>
+            <p className="workflow-info"><strong>Status:</strong> {workflow.lastRun ? workflow.lastRun.conclusion || "Läuft..." : "Noch nicht ausgeführt"}</p>
+            <p className="workflow-info"><strong>Event:</strong> {workflow.lastRun ? workflow.lastRun.event : "Unbekannt"}</p>
+            <p className="workflow-info"><strong>Branch:</strong> {workflow.lastRun ? workflow.lastRun.head_branch : "Unbekannt"}</p>
+            <p className="workflow-info"><strong>Gestartet von:</strong> {workflow.lastRun?.actor?.login || "Unbekannt"}</p>
+            <p className="workflow-info"><strong>Datum:</strong> {workflow.lastRun ? new Date(workflow.lastRun.created_at).toLocaleString() : "Unbekannt"}</p>
+            <a href={workflow.lastRun?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
               Zur Detailseite
             </a>
             {" | "}
-            <a href={`https://github.com/musrash/github-actions-dashboard-project/actions`} target="_blank" rel="noopener noreferrer">
+            <a href={`https://github.com/musrash/github-actions-dashboard-project/actions`} target="_blank" rel="noopener noreferrer" className="workflow-link">
               Zur GitHub Actions Übersicht
             </a>
           </div>
