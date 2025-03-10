@@ -1,9 +1,9 @@
-name: b-test-workflow
+name: first-test-workflow
 
 on:
   push:
     branches:
-      - test-branch 
+      - test-branch
 
 jobs:
   test:
