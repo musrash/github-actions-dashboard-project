@@ -1,15 +1,16 @@
-name: seconde-test-workflow
+name: a-seconde-test-workflow
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["test-workflow"]  
+    types:
+      - completed  
 
 jobs:
-  test:
+  second-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Run a test command
-        run: echo "Hello, GitHub Actions!"
+      - name: Run second test
+        run: echo "Hello from Second Test!"

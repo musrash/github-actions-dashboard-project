@@ -1,17 +1,18 @@
-name: failing-test-workflow
+name: s-fail-test-workflow
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["seconde-test-workflow"]
+    types:
+      - completed
 
 jobs:
-  test:
+  fail-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Run a test command
+      - name: Run failing test
         run: |
-          echo "Dieser Test schlägt absichtlich fail"
-          exit 1
+          echo "Dieser Test schlägt absichtlich fehl!"
+          exit 1  # Fehler erzwingen

@@ -1,4 +1,4 @@
-name: first-test-workflow
+name: b-first-test-workflow
 
 on:
   push:
