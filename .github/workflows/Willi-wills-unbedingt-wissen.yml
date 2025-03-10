@@ -1,0 +1,17 @@
+name: c-Willi-wills-undedingt-wissen
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Run a test command
+        run: | 
+            echo "Hello, GitHub Actions!"
+            exit 1
