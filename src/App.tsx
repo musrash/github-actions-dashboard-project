@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchWorkflows, fetchWorkflowRuns } from "./api/github";
-import "./App.css"; 
+import "./App.css";
 
 function App() {
   const [workflows, setWorkflows] = useState<any[]>([]);
@@ -8,6 +8,10 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [sortedWorkflows, setSortedWorkflows] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState<"name" | "date">("date");
+  const [favorites, setFavorites] = useState<number[]>(() => {
+    const storedFavorites = localStorage.getItem("favorites");
+    return storedFavorites ? JSON.parse(storedFavorites) : [];
+  });
 
   useEffect(() => {
     const loadWorkflows = async () => {
@@ -15,10 +19,8 @@ function App() {
         const owner = "musrash";
         const repo = "github-actions-dashboard-project";
 
-        // Workflows abrufen
         const workflowsData = await fetchWorkflows(owner, repo);
 
-        // Für jeden Workflow den letzten Lauf abrufen
         const workflowsWithRuns = await Promise.all(
           workflowsData.map(async (workflow: any) => {
             const lastRun = await fetchWorkflowRuns(owner, repo, workflow.id);
@@ -37,21 +39,36 @@ function App() {
     loadWorkflows();
   }, []);
 
-  //  Sortierung basierend auf "sortBy"
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
   useEffect(() => {
     const sorted = [...workflows].sort((a, b) => {
+      const isAFav = favorites.includes(a.id);
+      const isBFav = favorites.includes(b.id);
+
+      if (isAFav && !isBFav) return -1;
+      if (!isAFav && isBFav) return 1;
+      
       if (sortBy === "name") {
         return a.name.localeCompare(b.name);
       } else if (sortBy === "date") {
         const dateA = a.lastRun ? new Date(a.lastRun.created_at).getTime() : 0;
         const dateB = b.lastRun ? new Date(b.lastRun.created_at).getTime() : 0;
-        return dateB - dateA; 
+        return dateB - dateA;
       }
       return 0;
     });
 
     setSortedWorkflows(sorted);
-  }, [workflows, sortBy]);
+  }, [workflows, sortBy, favorites]);
+
+  const toggleFavorite = (id: number) => {
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
+    );
+  };
 
   return (
     <div className="app-container">
@@ -74,7 +91,7 @@ function App() {
             key={workflow.id}
             className={`workflow-card ${
               loading
-                ? "pending" 
+                ? "pending"
                 : workflow.lastRun?.conclusion === "success"
                 ? "success"
                 : workflow.lastRun?.conclusion === "failure"
@@ -82,8 +99,16 @@ function App() {
                 : "pending"
             }`}
           >
-            <h2 className="workflow-name">{workflow.name}</h2>
-            <p className="workflow-info"><strong>Status:</strong> {workflow.lastRun ? workflow.lastRun.conclusion || "Läuft..." : "Noch nicht ausgeführt"}</p>
+            <h2 className="workflow-name">
+              {workflow.name}
+              <button 
+                onClick={() => toggleFavorite(workflow.id)} 
+                className={`favorite-button ${favorites.includes(workflow.id) ? "favorite" : "not-favorite"}`}
+              >
+                {favorites.includes(workflow.id) ? "★" : "☆"}
+              </button>
+            </h2>
+            <p className="workflow-info"><strong>Status:</strong> {workflow.lastRun ? workflow.lastRun.conclusion || "load..." : "Noch nicht ausgeführt"}</p>
             <p className="workflow-info"><strong>Event:</strong> {workflow.lastRun ? workflow.lastRun.event : "Unbekannt"}</p>
             <p className="workflow-info"><strong>Branch:</strong> {workflow.lastRun ? workflow.lastRun.head_branch : "Unbekannt"}</p>
             <p className="workflow-info"><strong>Gestartet von:</strong> {workflow.lastRun?.actor?.login || "Unbekannt"}</p>
