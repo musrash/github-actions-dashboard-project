@@ -1,0 +1,15 @@
+name: b-first-test-workflow
+
+on:
+  push:
+    branches:
+      - test-branch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Run a test command
+        run: echo "Hello, GitHub Actions!"
