@@ -3,7 +3,7 @@ name: b-first-test-workflow
 on:
   push:
     branches:
-      - main
+      - test-branch
 
 jobs:
   test:
