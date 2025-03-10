@@ -24,11 +24,11 @@ function App() {
         const workflowsWithRuns = await Promise.all(
           workflowsData.map(async (workflow: any) => {
             const lastRun = await fetchWorkflowRuns(owner, repo, workflow.id);
-            return { ...workflow, lastRun };
+            return lastRun ? { ...workflow, lastRun } : null;
           })
         );
 
-        setWorkflows(workflowsWithRuns);
+        setWorkflows(workflowsWithRuns.filter(Boolean)); // Entfernt Workflows ohne Runs
       } catch (err) {
         setError("Fehler beim Laden der Workflows");
       } finally {
@@ -45,12 +45,17 @@ function App() {
 
   useEffect(() => {
     const sorted = [...workflows].sort((a, b) => {
-      const isAFav = favorites.includes(a.id);
-      const isBFav = favorites.includes(b.id);
+      const indexA = favorites.indexOf(a.id);
+      const indexB = favorites.indexOf(b.id);
 
-      if (isAFav && !isBFav) return -1;
-      if (!isAFav && isBFav) return 1;
-      
+      if (indexA !== -1 && indexB !== -1) {
+        return indexB - indexA;
+      } else if (indexA !== -1) {
+        return -1;
+      } else if (indexB !== -1) {
+        return 1;
+      }
+
       if (sortBy === "name") {
         return a.name.localeCompare(b.name);
       } else if (sortBy === "date") {
@@ -65,9 +70,13 @@ function App() {
   }, [workflows, sortBy, favorites]);
 
   const toggleFavorite = (id: number) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
-    );
+    setFavorites((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((fav) => fav !== id);
+      } else {
+        return [id, ...prev];
+      }
+    });
   };
 
   return (
@@ -90,9 +99,7 @@ function App() {
           <div
             key={workflow.id}
             className={`workflow-card ${
-              loading
-                ? "pending"
-                : workflow.lastRun?.conclusion === "success"
+              workflow.lastRun?.conclusion === "success"
                 ? "success"
                 : workflow.lastRun?.conclusion === "failure"
                 ? "failed"
@@ -103,23 +110,28 @@ function App() {
               {workflow.name}
               <button 
                 onClick={() => toggleFavorite(workflow.id)} 
-                className={`favorite-button ${favorites.includes(workflow.id) ? "favorite" : "not-favorite"}`}
+                className={`favorite-button ${favorites.includes(workflow.id) ? "favorite" : ""}`}
               >
                 {favorites.includes(workflow.id) ? "★" : "☆"}
               </button>
             </h2>
-            <p className="workflow-info"><strong>Status:</strong> {workflow.lastRun ? workflow.lastRun.conclusion || "load..." : "Noch nicht ausgeführt"}</p>
-            <p className="workflow-info"><strong>Event:</strong> {workflow.lastRun ? workflow.lastRun.event : "Unbekannt"}</p>
-            <p className="workflow-info"><strong>Branch:</strong> {workflow.lastRun ? workflow.lastRun.head_branch : "Unbekannt"}</p>
-            <p className="workflow-info"><strong>Gestartet von:</strong> {workflow.lastRun?.actor?.login || "Unbekannt"}</p>
-            <p className="workflow-info"><strong>Datum:</strong> {workflow.lastRun ? new Date(workflow.lastRun.created_at).toLocaleString() : "Unbekannt"}</p>
-            <a href={workflow.lastRun?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
-              Zur Detailseite
-            </a>
-            {" | "}
-            <a href={`https://github.com/musrash/github-actions-dashboard-project/actions`} target="_blank" rel="noopener noreferrer" className="workflow-link">
-              Zur GitHub Actions Übersicht
-            </a>
+            {workflow.lastRun && (
+              <>
+                <p className="workflow-info"><strong>Status:</strong> {workflow.lastRun.conclusion || "load..."}</p>
+                <p className="workflow-info"><strong>Event:</strong> {workflow.lastRun.event}</p>
+                <p className="workflow-info"><strong>Branch:</strong> {workflow.lastRun.head_branch}</p>
+                <p className="workflow-info"><strong>Gestartet von:</strong> {workflow.lastRun?.actor?.login}</p>
+                <p className="workflow-info"><strong>Datum:</strong> {new Date(workflow.lastRun.created_at).toLocaleString("de-DE", { 
+                   day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"  })}</p>
+                <a href={workflow.lastRun?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
+                  Zur Detailseite
+                </a>
+                {" | "}
+                <a href={`https://github.com/musrash/github-actions-dashboard-project/actions`} target="_blank" rel="noopener noreferrer" className="workflow-link">
+                  Zur GitHub Actions Übersicht
+                </a>
+              </>
+            )}
           </div>
         ))}
       </div>
