@@ -2,7 +2,7 @@ name: s-fail-test-workflow
 
 on:
   workflow_run:
-    workflows: ["seconde-test-workflow"]
+    workflows: ["a-seconde-test-workflow"]
     types:
       - completed
 
