@@ -103,9 +103,7 @@ function App() {
                 ? "success"
                 : workflow.lastRun?.conclusion === "failure"
                 ? "failed"
-                : workflow.lastRun?.conclusion === "in_progress"
-                ? "pending"
-                : "unknown"
+                : "pending"
             }`}
           >
             <h2 className="workflow-name">
@@ -117,7 +115,7 @@ function App() {
                 {favorites.includes(workflow.id) ? "★" : "☆"}
               </button>
             </h2>
-            {workflow.lastRun && workflow.lastRun.conclusion !== "in_progress" && (
+            {workflow.lastRun && (
               <>
                 <p className="workflow-info"><strong>Status:</strong> {workflow.lastRun.conclusion || "load..."}</p>
                 <p className="workflow-info"><strong>Event:</strong> {workflow.lastRun.event}</p>

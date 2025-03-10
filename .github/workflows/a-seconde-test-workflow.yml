@@ -2,7 +2,7 @@ name: a-seconde-test-workflow
 
 on:
   workflow_run:
-    workflows: ["b-first-test-workflow"]
+    workflows: ["b-test-workflow"]
     types:
       - completed  
 
