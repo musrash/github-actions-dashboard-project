@@ -12,4 +12,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Run a test command
-        run: echo "Hello, GitHub Actions!"
+        run: |
+          echo "Dieser Test schlägt absichtlich fail"
+          exit 1
