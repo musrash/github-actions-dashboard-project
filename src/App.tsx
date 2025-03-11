@@ -13,7 +13,6 @@ function App() {
     return storedFavorites ? JSON.parse(storedFavorites) : [];
   });
 
-  useEffect(() => {
     const loadWorkflows = async () => {
       try {
         const owner = "musrash";
@@ -37,7 +36,7 @@ function App() {
     };
 
     loadWorkflows();
-  }, []);
+ 
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
