@@ -34,3 +34,13 @@ export async function fetchWorkflowRuns(owner: string, repo: string, workflowId:
   const data = await response.json();
   return data.workflow_runs.length > 0 ? data.workflow_runs[0] : null;
 }
+
+export async function fetchWorkflowJobs(owner: string, repo: string, runId: number) {
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/actions/runs/${runId}/jobs`
+  );
+  if (!response.ok) {
+    throw new Error("Fehler beim Laden der Job-Daten");
+  }
+  return await response.json();
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchWorkflows, fetchWorkflowRuns } from "./api/github";
+import { fetchWorkflows, fetchWorkflowRuns, fetchWorkflowJobs } from "./api/github";
 import "./App.css";
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
     return storedFavorites ? JSON.parse(storedFavorites) : [];
   });
 
+  useEffect(() => {
     const loadWorkflows = async () => {
       try {
         const owner = "musrash";
@@ -22,12 +23,23 @@ function App() {
 
         const workflowsWithRuns = await Promise.all(
           workflowsData.map(async (workflow: any) => {
+
             const lastRun = await fetchWorkflowRuns(owner, repo, workflow.id);
-            return lastRun ? { ...workflow, lastRun } : null;
+            if (lastRun) {
+              const jobsData = await fetchWorkflowJobs(owner, repo, lastRun.id);
+              const jobDetails =
+                jobsData && jobsData.jobs && jobsData.jobs.length > 0
+                  ? jobsData.jobs[0]
+                  : null;
+              return jobDetails ? { ...workflow, lastRun, jobDetails } : null;
+            }
+            return null;
+
+
           })
         );
 
-        setWorkflows(workflowsWithRuns.filter(Boolean)); // Entfernt Workflows ohne Runs
+        setWorkflows(workflowsWithRuns.filter(Boolean)); 
       } catch (err) {
         setError("Fehler beim Laden der Workflows");
       } finally {
@@ -36,7 +48,7 @@ function App() {
     };
 
     loadWorkflows();
- 
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
@@ -123,11 +135,11 @@ function App() {
                 <p className="workflow-info"><strong>Datum:</strong> {new Date(workflow.lastRun.created_at).toLocaleString("de-DE", { 
                    day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit"  })}</p>
                 <a href={workflow.lastRun?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
-                  Zur Detailseite
+                  Zur GitHub Actions Übersicht
                 </a>
                 {" | "}
-                <a href={`https://github.com/musrash/github-actions-dashboard-project/actions`} target="_blank" rel="noopener noreferrer" className="workflow-link">
-                  Zur GitHub Actions Übersicht
+                <a href={workflow.jobDetails?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
+                  Zur Detailseite
                 </a>
               </>
             )}
