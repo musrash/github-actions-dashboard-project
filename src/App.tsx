@@ -137,10 +137,7 @@ function App() {
                 <a href={workflow.lastRun?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
                   Zur GitHub Actions Übersicht
                 </a>
-                {" | "}
-                <a href={workflow.jobDetails?.html_url} target="_blank" rel="noopener noreferrer" className="workflow-link">
-                  Zur Detailseite
-                </a>
+
               </>
             )}
           </div>
